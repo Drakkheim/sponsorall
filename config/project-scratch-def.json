@@ -1,6 +1,6 @@
 {
-  "orgName": "vboxuser company",
-  "edition": "Developer",
+  "orgName": "Sponsorall Nonprofit Scratch Org",
+  "edition": "Enterprise",
   "features": ["EnableSetPasswordInApi"],
   "settings": {
     "lightningExperienceSettings": {
@@ -9,5 +9,14 @@
     "mobileSettings": {
       "enableS1EncryptedStoragePref2": false
     }
-  }
+  },
+  "packageAliases": {
+    "npsp": "04t1I000000ka9mQAA"
+  },
+  "installedPackages": [
+    {
+      "id": "04t1I000000ka9mQAA",
+      "versionNumber": "3.235.0.0"
+    }
+  ]
 }
