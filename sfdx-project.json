@@ -8,5 +8,8 @@
   "name": "sponsorall",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "64.0"
+  "sourceApiVersion": "64.0",
+  "packageAliases": {
+    "nonprofit-cloud": "04t4V000004qILNQA2"
+  }
 }

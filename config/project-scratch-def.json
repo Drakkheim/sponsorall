@@ -1,22 +1,5 @@
 {
-  "orgName": "Sponsorall Nonprofit Scratch Org",
-  "edition": "Enterprise",
-  "features": ["EnableSetPasswordInApi"],
-  "settings": {
-    "lightningExperienceSettings": {
-      "enableS1DesktopEnabled": true
-    },
-    "mobileSettings": {
-      "enableS1EncryptedStoragePref2": false
-    }
-  },
-  "packageAliases": {
-    "npsp": "04t1I000000ka9mQAA"
-  },
-  "installedPackages": [
-    {
-      "id": "04t1I000000ka9mQAA",
-      "versionNumber": "3.235.0.0"
-    }
-  ]
+  "orgName": "SponsorallNPC",
+  "sourceOrg": "00Daj00000VVLeD",
+  "edition": "Enterprise"
 }
