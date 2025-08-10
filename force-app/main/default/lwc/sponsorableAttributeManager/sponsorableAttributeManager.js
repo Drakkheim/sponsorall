@@ -36,10 +36,10 @@ export default class SponsorableAttributeManager extends LightningElement {
             return {
                 ...attr,
                 isEditing: !!this._editModeMap[attr.Id],
-                isCheckbox: dataType === 'Boolean',
-                isText: ['Text', 'Picklist', 'TextArea'].includes(dataType),
-                isNumber: ['Number', 'Currency'].includes(dataType),
-                isDate: ['Date', 'DateTime'].includes(dataType),
+                isCheckbox: dataType === 'Checkbox',
+                isText: ['Text', 'Picklist', 'LongText'].includes(dataType),
+                isNumber: dataType === 'Number',
+                isDate: dataType === 'Date',
                 checkboxIconName: attr.editValue ? 'utility:check' : 'utility:close'
             };
         });
@@ -47,6 +47,24 @@ export default class SponsorableAttributeManager extends LightningElement {
     
     connectedCallback() {
         this.loadAttributes();
+    }
+
+    getDisplayValue(attribute) {
+        switch (attribute.Attribute_Type__r?.Data_Type__c) {
+            case 'Text':
+            case 'LongText':
+                return attribute.Text_Value__c || '';
+            case 'Number':
+                return attribute.Number_Value__c || 0;
+            case 'Date':
+                return attribute.Date_Value__c || '';
+            case 'Checkbox':
+                return attribute.Checkbox_Value__c || false;
+            case 'Picklist':
+                return attribute.Picklist_Value__c || '';
+            default:
+                return '';
+        }
     }
     
     async loadAttributes() {
@@ -57,7 +75,7 @@ export default class SponsorableAttributeManager extends LightningElement {
             this._attributes = result.map(attr => {
                 return {
                     ...attr,
-                    editValue: attr.Value__c
+                    editValue: this.getDisplayValue(attr)
                 };
             });
             
@@ -93,7 +111,7 @@ export default class SponsorableAttributeManager extends LightningElement {
             const updatedAttributes = [...this._attributes];
             updatedAttributes[attributeIndex] = {
                 ...updatedAttributes[attributeIndex],
-                editValue: originalAttribute.Value__c
+                editValue: this.getDisplayValue(originalAttribute)
             };
             this._attributes = updatedAttributes;
         }
@@ -149,7 +167,7 @@ export default class SponsorableAttributeManager extends LightningElement {
     checkForChanges() {
         this._hasChanges = this._attributes.some(attr => {
             const originalAttr = this._originalAttributes.find(origAttr => origAttr.Id === attr.Id);
-            return originalAttr && attr.editValue !== originalAttr.Value__c;
+            return originalAttr && attr.editValue !== this.getDisplayValue(originalAttr);
         });
     }
     
@@ -158,10 +176,35 @@ export default class SponsorableAttributeManager extends LightningElement {
             this._isLoading = true;
             
             const updatedAttributes = this._attributes.map(attr => {
-                return {
+                const updateData = {
                     Id: attr.Id,
-                    Value__c: attr.editValue
+                    Text_Value__c: null,
+                    Number_Value__c: null,
+                    Date_Value__c: null,
+                    Checkbox_Value__c: null,
+                    Picklist_Value__c: null
                 };
+
+                switch (attr.Attribute_Type__r?.Data_Type__c) {
+                    case 'Text':
+                    case 'LongText':
+                        updateData.Text_Value__c = attr.editValue;
+                        break;
+                    case 'Number':
+                        updateData.Number_Value__c = parseFloat(attr.editValue) || 0;
+                        break;
+                    case 'Date':
+                        updateData.Date_Value__c = attr.editValue;
+                        break;
+                    case 'Checkbox':
+                        updateData.Checkbox_Value__c = attr.editValue;
+                        break;
+                    case 'Picklist':
+                        updateData.Picklist_Value__c = attr.editValue;
+                        break;
+                }
+
+                return updateData;
             });
             
             await saveAttributes({ attributesToUpdate: updatedAttributes });

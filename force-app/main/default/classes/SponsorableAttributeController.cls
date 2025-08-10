@@ -1,7 +1,7 @@
 public with sharing class SponsorableAttributeController {
     
     @AuraEnabled(cacheable=true)
-    public static List<Sponsorable_Attribute__c> getSponsorableAttributes(Id sponsorableId) {
+    public static List<Sponsorable_Attribute__c> getSponsorableAttributes(Id recordId) {
         try {
             return [
                 SELECT Id, Name,
@@ -15,7 +15,7 @@ public with sharing class SponsorableAttributeController {
                        Attribute_Type__r.Default_Value__c,
                        Attribute_Type__r.Picklist_Choices__c
                 FROM Sponsorable_Attribute__c
-                WHERE Sponsorable__c = :sponsorableId
+                WHERE Sponsorable__c = :recordId
                 ORDER BY Attribute_Type__r.Name ASC
             ];
         } catch (Exception e) {
@@ -24,11 +24,11 @@ public with sharing class SponsorableAttributeController {
     }
     
     @AuraEnabled
-    public static void saveAttributes(Sponsorable_Attribute__c attributeData) {
+    public static void saveAttributes(List<Sponsorable_Attribute__c> attributesToUpdate) {
         try {
-            upsert attributeData;
+            upsert attributesToUpdate;
         } catch (Exception e) {
-            throw new AuraHandledException('Error updating sponsorable attribute: ' + e.getMessage());
+            throw new AuraHandledException('Error updating sponsorable attributes: ' + e.getMessage());
         }
     }
     
