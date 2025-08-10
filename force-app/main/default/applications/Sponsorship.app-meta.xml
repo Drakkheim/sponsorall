@@ -16,6 +16,7 @@
     <tabs>standard-Campaign</tabs>
     <tabs>standard-Case</tabs>
     <tabs>Sponsorship_Transaction__c</tabs>
+    <tabs>Sponsorship_Need__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>Sponsorship_UtilityBar</utilityBar>
 </CustomApplication>
