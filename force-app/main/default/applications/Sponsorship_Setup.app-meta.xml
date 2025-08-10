@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
     <brand>
-        <headerColor>#624CCE</headerColor>
+        <headerColor>#710F34</headerColor>
         <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
     </brand>
     <formFactors>Small</formFactors>
@@ -10,14 +10,15 @@
     <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
     <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
     <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
-    <label>Sponsorship</label>
+    <label>Sponsorship Configuration</label>
     <navType>Standard</navType>
-    <tabs>standard-Contact</tabs>
-    <tabs>standard-Campaign</tabs>
-    <tabs>standard-Case</tabs>
-    <tabs>Sponsorship_Transaction__c</tabs>
-    <tabs>Sponsorship_Need__c</tabs>
     <tabs>Sponsorable_Segment__c</tabs>
+    <tabs>Sponsorable__c</tabs>
+    <tabs>Sponsorship_Need__c</tabs>
+    <tabs>Sponsorship_Transaction__c</tabs>
+    <tabs>standard-Campaign</tabs>
+    <tabs>standard-report</tabs>
+    <tabs>Sponsorable_Attribute_Definition__c</tabs>
     <uiType>Lightning</uiType>
-    <utilityBar>Sponsorship_UtilityBar</utilityBar>
+    <utilityBar>Sponsorship_Configuration_UtilityBar</utilityBar>
 </CustomApplication>

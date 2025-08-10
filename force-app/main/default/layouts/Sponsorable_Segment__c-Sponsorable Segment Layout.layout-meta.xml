@@ -16,7 +16,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Available_For_Sponsorship__c</field>
+                <field>Parent_Segment__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -79,11 +79,7 @@
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
-        <relatedList>Sponsorable_Attribute__c.Sponsorable__c</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>NAME</fields>
-        <relatedList>Sponsorship_Need__c.Sponsorable__c</relatedList>
+        <relatedList>Sponsorable_Segment__c.Parent_Segment__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>

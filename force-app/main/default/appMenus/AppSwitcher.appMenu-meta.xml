@@ -76,4 +76,8 @@
         <name>Sponsorship</name>
         <type>CustomApplication</type>
     </appMenuItems>
+    <appMenuItems>
+        <name>Sponsorship_Setup</name>
+        <type>CustomApplication</type>
+    </appMenuItems>
 </AppMenu>

@@ -133,14 +133,14 @@ Represents physical locations or other organizational segments.
 
 ## 8. Custom Attributes
 
-### Sponsorable_Attribute_Definition__mdt (Custom Metadata Type)  
+### Sponsorable_Attribute_Definition__c  
 Defines attribute templates for sponsorable types.
 
 | Field Name         | Type           | Description / Tooltip                        |
 |--------------------|----------------|---------------------------------------------|
-| Attribute_Name__c  | Text(255)      | Name of the attribute                        |
+| Name               | Text(255)      | Name of the attribute                        |
 | Data_Type__c       | Picklist       | Data type (Text, Number, Date, Checkbox, etc.) |
-| Required__c        | Checkbox      | Whether the attribute is mandatory           |
+| Required__c        | Checkbox       | Whether the attribute is mandatory           |
 | Default_Value__c   | Text(255)      | Default value for the attribute              |
 
 ---
@@ -148,12 +148,14 @@ Defines attribute templates for sponsorable types.
 ### Sponsorable_Attribute__c  
 Stores attribute values per Sponsorable.
 
-| Field Name               | Type               | Description / Tooltip                        |
-|--------------------------|--------------------|---------------------------------------------|
-| Sponsorable__c          | Lookup(Sponsorable__c) | Sponsorable entity this attribute applies to |
-
+| Field Name                   | Type                      | Description / Tooltip                        |
+|------------------------------|---------------------------|---------------------------------------------|
+| Sponsorable__c              | Lookup(Sponsorable__c)     | Sponsorable entity this attribute applies to |
+| Attribute_Definition__c     | Lookup(Sponsorable_Attribute_Definition__c) | Attribute                   |
+| Value__c                    | Text(255)                 | Value assigned for this attribute            |
 
 ---
+
 
 ### Sharing Model Notes  
 - `Sponsorship_Opportunity__c` and `Sponsorship_Transaction__c` objects should have external sharing set to **Private**.  
