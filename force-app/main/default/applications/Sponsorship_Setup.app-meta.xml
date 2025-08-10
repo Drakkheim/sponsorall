@@ -15,10 +15,10 @@
     <tabs>Sponsorable_Segment__c</tabs>
     <tabs>Sponsorable__c</tabs>
     <tabs>Sponsorship_Need__c</tabs>
+    <tabs>Sponsorable_Attribute_Definition__c</tabs>
     <tabs>Sponsorship_Transaction__c</tabs>
     <tabs>standard-Campaign</tabs>
     <tabs>standard-report</tabs>
-    <tabs>Sponsorable_Attribute_Definition__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>Sponsorship_Configuration_UtilityBar</utilityBar>
 </CustomApplication>
