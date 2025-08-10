@@ -159,6 +159,4 @@ Stores attribute values per Sponsorable.
 - `Sponsorship_Opportunity__c` and `Sponsorship_Transaction__c` objects should have external sharing set to **Private**.  
 - `Sponsorship_Transaction_Line_Item__c` master-detail to Sponsorship_Transaction__c should be **Not Reparentable**.
 
----
 
-Feel free to ask if you'd like me to add sections for tagging, segmentation, or custom attributes next!
