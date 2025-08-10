@@ -86,6 +86,75 @@ Junction between transactions and sponsorship opportunities.
 
 ---
 
+## 6. Tagging
+
+### Sponsorship_Tag__c  
+Generic tag object to apply tags to Sponsorables and Sponsorship Needs.
+
+| Field Name       | Type          | Description / Tooltip                          |
+|------------------|---------------|-----------------------------------------------|
+| Name             | Text(255)     | The name of the tag                            |
+| Tag_Type__c      | Picklist      | Category/type of the tag (e.g., Theme, Priority) |
+
+---
+
+### Junction Objects for Tagging
+
+#### Sponsorable_Tag__c  
+Links Sponsorable items to Tags.
+
+| Field Name         | Type               | Description / Tooltip                        |
+|--------------------|--------------------|---------------------------------------------|
+| Sponsorable__c     | Master-Detail       | Related Sponsorable item                     |
+| Sponsorship_Tag__c | Lookup             | Related Tag                                 |
+
+#### Sponsorship_Need_Tag__c  
+Links Sponsorship Needs to Tags.
+
+| Field Name         | Type               | Description / Tooltip                        |
+|--------------------|--------------------|---------------------------------------------|
+| Sponsorship_Need__c | Master-Detail      | Related Sponsorship Need                     |
+| Sponsorship_Tag__c  | Lookup             | Related Tag                                 |
+
+---
+
+## 7. Segmentation
+
+### Sponsorable_Segment__c  
+Represents physical locations or other organizational segments.
+
+| Field Name       | Type           | Description / Tooltip                        |
+|------------------|----------------|---------------------------------------------|
+| Name             | Text(255)      | Name of the segment                          |
+| Description__c   | RichTextArea(32000) | Description or details about the segment     |
+| Parent_Segment__c | Lookup(Sponsorable_Segment__c) | Optional parent segment for hierarchy         |
+
+---
+
+## 8. Custom Attributes
+
+### Sponsorable_Attribute_Definition__mdt (Custom Metadata Type)  
+Defines attribute templates for sponsorable types.
+
+| Field Name         | Type           | Description / Tooltip                        |
+|--------------------|----------------|---------------------------------------------|
+| Attribute_Name__c  | Text(255)      | Name of the attribute                        |
+| Data_Type__c       | Picklist       | Data type (Text, Number, Date, Checkbox, etc.) |
+| Required__c        | Checkbox      | Whether the attribute is mandatory           |
+| Default_Value__c   | Text(255)      | Default value for the attribute              |
+
+---
+
+### Sponsorable_Attribute__c  
+Stores attribute values per Sponsorable.
+
+| Field Name               | Type               | Description / Tooltip                        |
+|--------------------------|--------------------|---------------------------------------------|
+| Sponsorable__c          | Lookup(Sponsorable__c) | Sponsorable entity this attribute applies to |
+
+
+---
+
 ### Sharing Model Notes  
 - `Sponsorship_Opportunity__c` and `Sponsorship_Transaction__c` objects should have external sharing set to **Private**.  
 - `Sponsorship_Transaction_Line_Item__c` master-detail to Sponsorship_Transaction__c should be **Not Reparentable**.
