@@ -24,9 +24,9 @@ public with sharing class SponsorableAttributeController {
     }
     
     @AuraEnabled
-    public static void updateSponsorableAttribute(Sponsorable_Attribute__c attributeData) {
+    public static void saveAttributes(Sponsorable_Attribute__c attributeData) {
         try {
-            update attributeData;
+            upsert attributeData;
         } catch (Exception e) {
             throw new AuraHandledException('Error updating sponsorable attribute: ' + e.getMessage());
         }
