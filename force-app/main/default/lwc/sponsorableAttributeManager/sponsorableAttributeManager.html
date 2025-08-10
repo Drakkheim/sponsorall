@@ -1,0 +1,109 @@
+<template>
+    <lightning-card title="Sponsorable Attributes" icon-name="standard:custom">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading attributes..."></lightning-spinner>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:true={hasAttributes}>
+                <div class="slds-p-horizontal_medium">
+                    <template for:each={attributes} for:item="attribute">
+                        <div key={attribute.Id} class="slds-border_bottom slds-p-vertical_small">
+                            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                <div class="slds-col slds-size_1-of-3">
+                                    <div class="slds-text-heading_small">{attribute.Attribute_Type__r.Name}</div>
+                                    <template if:true={attribute.Attribute_Type__r.Required__c}>
+                                        <span class="slds-text-color_error">*</span>
+                                    </template>
+                                </div>
+                                
+                                <div class="slds-col slds-size_1-of-3">
+                                    <template if:false={editMode[attribute.Id]}>
+                                        <template if:true={isCheckboxType(attribute.Attribute_Type__r.Data_Type__c)}>
+                                            <lightning-icon 
+                                                icon-name={attribute.Checkbox_Value__c ? 'utility:check' : 'utility:close'}
+                                                size="x-small"
+                                                variant={attribute.Checkbox_Value__c ? 'success' : 'error'}>
+                                            </lightning-icon>
+                                        </template>
+                                        <template if:false={isCheckboxType(attribute.Attribute_Type__r.Data_Type__c)}>
+                                            <div class="slds-truncate" title={attribute.editValue}>
+                                                {attribute.editValue}
+                                            </div>
+                                        </template>
+                                    </template>
+                                    
+                                    <template if:true={editMode[attribute.Id]}>
+                                        <template if:true={isCheckboxType(attribute.Attribute_Type__r.Data_Type__c)}>
+                                            <lightning-input
+                                                type="checkbox"
+                                                checked={attribute.editValue}
+                                                data-id={attribute.Id}
+                                                onchange={handleInputChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template if:true={isPicklistType(attribute.Attribute_Type__r.Data_Type__c)}>
+                                            <lightning-combobox
+                                                value={attribute.editValue}
+                                                options={getPicklistOptions(attribute)}
+                                                data-id={attribute.Id}
+                                                onchange={handleInputChange}>
+                                            </lightning-combobox>
+                                        </template>
+                                        <template if:false={isCheckboxType(attribute.Attribute_Type__r.Data_Type__c)}>
+                                            <template if:false={isPicklistType(attribute.Attribute_Type__r.Data_Type__c)}>
+                                                <lightning-input
+                                                    type={getInputType(attribute.Attribute_Type__r.Data_Type__c)}
+                                                    value={attribute.editValue}
+                                                    data-id={attribute.Id}
+                                                    onchange={handleInputChange}>
+                                                </lightning-input>
+                                            </template>
+                                        </template>
+                                    </template>
+                                </div>
+                                
+                                <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                    <template if:false={editMode[attribute.Id]}>
+                                        <lightning-button
+                                            variant="brand-outline"
+                                            label="Edit"
+                                            size="small"
+                                            data-id={attribute.Id}
+                                            onclick={handleEdit}>
+                                        </lightning-button>
+                                    </template>
+                                    
+                                    <template if:true={editMode[attribute.Id]}>
+                                        <lightning-button
+                                            variant="success"
+                                            label="Save"
+                                            size="small"
+                                            data-id={attribute.Id}
+                                            onclick={handleSave}
+                                            class="slds-m-right_x-small">
+                                        </lightning-button>
+                                        <lightning-button
+                                            variant="neutral"
+                                            label="Cancel"
+                                            size="small"
+                                            data-id={attribute.Id}
+                                            onclick={handleCancel}>
+                                        </lightning-button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            
+            <template if:false={hasAttributes}>
+                <div class="slds-p-medium slds-text-align_center">
+                    <lightning-icon icon-name="utility:info" size="medium" variant="warning"></lightning-icon>
+                    <p class="slds-m-top_small">No attributes defined for this sponsorable item.</p>
+                </div>
+            </template>
+        </template>
+    </lightning-card>
+</template>
