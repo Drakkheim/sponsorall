@@ -2,6 +2,10 @@
 
 SponsorAll is a flexible sponsorship management solution built on Salesforce, designed to help organizations define sponsorable items, sponsorship needs, and manage pledges and transactions seamlessly. This solution supports recurring sponsorships, installment plans, tagging, segmentation, and customizable attributes for a wide range of use cases.
 
+# NOTICE!
+
+Sponsorall is an attempt to use several different AI models with the goal being to identity what a real production ready development pipeline would look like. Currently this project is NON FUNCTIONAL and under HEAVY Continual Refactoring.  I will attempt to Annotate AI specific Commits with which AI suggested the changes.
+
 ## Current Features
 
 - Define sponsorable entities and their specific sponsorship needs  

@@ -10,6 +10,7 @@
             <objects>
                 <object>Sponsorable__c</object>
             </objects>
+            <property name="cardTitle" type="String" default="Sponsorable Attributes" label="Card Title" description="The title displayed on the card header"/>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

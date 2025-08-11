@@ -1,5 +1,17 @@
 <template>
-    <lightning-card title="Sponsorable Attributes" icon-name="standard:custom">
+    <lightning-card title={cardTitle} >
+        <div slot="actions">
+            <template if:false={isEditMode}>
+                <lightning-button
+                    label="Edit"
+                    variant="brand-outline"
+                    icon-name="utility:edit"
+                    onclick={handleEdit}
+                    disabled={isLoading}>
+                </lightning-button>
+            </template>
+        </div>
+        
         <template if:true={isLoading}>
             <lightning-spinner alternative-text="Loading attributes..."></lightning-spinner>
         </template>
@@ -8,22 +20,24 @@
             <template if:true={hasAttributes}>
                 <div class="slds-p-horizontal_medium">
                     <template for:each={attributes} for:item="attribute">
-                        <div key={attribute.Id} class="slds-border_bottom slds-p-vertical_small">
+                        <div key={attribute.uniqueId} class="slds-border_bottom slds-p-vertical_small">
                             <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
                                 <div class="slds-col slds-size_1-of-3">
-                                    <div class="slds-text-heading_small">{attribute.Attribute_Type__r.Name}</div>
-                                    <template if:true={attribute.Attribute_Type__r.Required__c}>
-                                        <span class="slds-text-color_error">*</span>
-                                    </template>
+                                    <div class="">
+                                        {attribute.Attribute_Type__r.Name}
+                                        <template if:true={attribute.Attribute_Type__r.Required__c}>
+                                            <span class="slds-text-color_error"> *</span>
+                                        </template>
+                                    </div>
                                 </div>
                                 
-                                <div class="slds-col slds-size_1-of-3">
-                                    <!-- Fixed: Corrected the editMode expression -->
-                                    <template if:false={attribute.isEditing}>
+                                <div class="slds-col slds-size_2-of-3">
+                                    <template if:false={isEditMode}>
                                         <template if:true={attribute.isCheckbox}>
                                             <lightning-icon 
                                                 icon-name={attribute.checkboxIconName}
-                                                size="x-small">
+                                                size="x-small"
+                                                variant={attribute.editValue}>
                                             </lightning-icon>
                                         </template>
                                         <template if:false={attribute.isCheckbox}>
@@ -33,14 +47,13 @@
                                         </template>
                                     </template>
                                     
-                                    <!-- Fixed: Corrected the editMode expression -->
-                                    <template if:true={attribute.isEditing}>
+                                    <template if:true={isEditMode}>
                                         <template if:true={attribute.isCheckbox}>
                                             <lightning-input
                                                 type="checkbox"
                                                 checked={attribute.editValue}
                                                 onchange={handleCheckboxChange}
-                                                data-id={attribute.Id}>
+                                                data-uniqueid={attribute.uniqueId}>
                                             </lightning-input>
                                         </template>
                                         
@@ -49,7 +62,7 @@
                                                 type="text"
                                                 value={attribute.editValue}
                                                 onchange={handleTextChange}
-                                                data-id={attribute.Id}>
+                                                data-uniqueid={attribute.uniqueId}>
                                             </lightning-input>
                                         </template>
                                         
@@ -58,7 +71,7 @@
                                                 type="number"
                                                 value={attribute.editValue}
                                                 onchange={handleNumberChange}
-                                                data-id={attribute.Id}>
+                                                data-uniqueid={attribute.uniqueId}>
                                             </lightning-input>
                                         </template>
                                         
@@ -67,38 +80,26 @@
                                                 type="date"
                                                 value={attribute.editValue}
                                                 onchange={handleDateChange}
-                                                data-id={attribute.Id}>
+                                                data-uniqueid={attribute.uniqueId}>
                                             </lightning-input>
                                         </template>
-                                    </template>
-                                </div>
-                                
-                                <div class="slds-col slds-size_1-of-3 slds-text-align_right">
-                                    <!-- Fixed: Corrected the editMode expression -->
-                                    <template if:false={attribute.isEditing}>
-                                        <lightning-button-icon
-                                            icon-name="utility:edit"
-                                            alternative-text="Edit"
-                                            onclick={handleEditClick}
-                                            data-id={attribute.Id}>
-                                        </lightning-button-icon>
-                                    </template>
-                                    
-                                    <!-- Fixed: Corrected the editMode expression -->
-                                    <template if:true={attribute.isEditing}>
-                                        <lightning-button-icon
-                                            icon-name="utility:check"
-                                            alternative-text="Save"
-                                            onclick={handleSaveClick}
-                                            class="slds-m-right_x-small"
-                                            data-id={attribute.Id}>
-                                        </lightning-button-icon>
-                                        <lightning-button-icon
-                                            icon-name="utility:close"
-                                            alternative-text="Cancel"
-                                            onclick={handleCancelClick}
-                                            data-id={attribute.Id}>
-                                        </lightning-button-icon>
+                                        
+                                        <template if:true={attribute.isPicklist}>
+                                            <lightning-combobox
+                                                value={attribute.editValue}
+                                                options={attribute.picklistOptions}
+                                                onchange={handlePicklistChange}
+                                                data-uniqueid={attribute.uniqueId}>
+                                            </lightning-combobox>
+                                        </template>
+                                        
+                                        <template if:true={attribute.isLongText}>
+                                            <lightning-textarea
+                                                value={attribute.editValue}
+                                                onchange={handleTextChange}
+                                                data-uniqueid={attribute.uniqueId}>
+                                            </lightning-textarea>
+                                        </template>
                                     </template>
                                 </div>
                             </div>
@@ -106,14 +107,24 @@
                     </template>
                 </div>
                 
-                <div class="slds-p-horizontal_medium slds-p-top_medium">
-                    <lightning-button
-                        label="Save All Changes"
-                        variant="brand"
-                        onclick={handleSaveAll}
-                        disabled={isChangesMissing}>
-                    </lightning-button>
-                </div>
+                <template if:true={isEditMode}>
+                    <div class="slds-card__footer slds-p-around_medium slds-text-align_center">
+                        <lightning-button-group>
+                            <lightning-button
+                                label="Save"
+                                variant="brand"
+                                onclick={handleSave}
+                                disabled={isLoading}>
+                            </lightning-button>
+                            <lightning-button
+                                label="Cancel"
+                                variant="neutral"
+                                onclick={handleCancel}
+                                disabled={isLoading}>
+                            </lightning-button>
+                        </lightning-button-group>
+                    </div>
+                </template>
             </template>
             
             <template if:false={hasAttributes}>

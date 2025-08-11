@@ -5,10 +5,11 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class SponsorableAttributeManager extends LightningElement {
     @api recordId;
+    @api cardTitle = 'Sponsorable Attributes';
     _attributes = [];
     _originalAttributes = [];
     _isLoading = true;
-    _editModeMap = {};
+    _isEditMode = false;
     _hasChanges = false;
     
     // Getter for isLoading
@@ -27,20 +28,26 @@ export default class SponsorableAttributeManager extends LightningElement {
     }
     
     get isChangesMissing() {
-    return !this._hasChanges;
-}
+        return !this._hasChanges;
+    }
+    
+    get isEditMode() {
+        return this._isEditMode;
+    }
     // Getter for attributes with computed properties
     get attributes() {
         return this._attributes.map(attr => {
             const dataType = attr.Attribute_Type__r?.Data_Type__c || '';
             return {
                 ...attr,
-                isEditing: !!this._editModeMap[attr.Id],
                 isCheckbox: dataType === 'Checkbox',
-                isText: ['Text', 'Picklist', 'LongText'].includes(dataType),
+                isText: dataType === 'Text',
+                isLongText: dataType === 'LongText',
+                isPicklist: dataType === 'Picklist',
                 isNumber: dataType === 'Number',
                 isDate: dataType === 'Date',
-                checkboxIconName: attr.editValue ? 'utility:check' : 'utility:close'
+                checkboxIconName: attr.editValue ? 'utility:check' : 'utility:close',
+                picklistOptions: this.getPicklistOptions(attr)
             };
         });
     }
@@ -49,8 +56,9 @@ export default class SponsorableAttributeManager extends LightningElement {
         this.loadAttributes();
     }
 
-    getDisplayValue(attribute) {
-        switch (attribute.Attribute_Type__r?.Data_Type__c) {
+    getDisplayValue(attribute, definition = null) {
+        const dataType = definition?.Data_Type__c || attribute.Attribute_Type__r?.Data_Type__c;
+        switch (dataType) {
             case 'Text':
             case 'LongText':
                 return attribute.Text_Value__c || '';
@@ -72,10 +80,23 @@ export default class SponsorableAttributeManager extends LightningElement {
             this._isLoading = true;
             const result = await getAttributes({ recordId: this.recordId });
             
-            this._attributes = result.map(attr => {
+            this._attributes = result.map((wrapper, index) => {
+                const attr = wrapper.attribute;
+                const def = wrapper.definition;
+                // Use a unique identifier for edit mode tracking
+                const uniqueId = attr.Id || `temp_${def.Id}_${index}`;
                 return {
                     ...attr,
-                    editValue: this.getDisplayValue(attr)
+                    uniqueId: uniqueId,
+                    Attribute_Type__r: {
+                        Id: def.Id,
+                        Name: def.Name,
+                        Data_Type__c: def.Data_Type__c,
+                        Required__c: def.Required__c,
+                        Default_Value__c: def.Default_Value__c,
+                        Picklist_Choices__c: def.Picklist_Choices__c
+                    },
+                    editValue: this.getDisplayValue(attr, def)
                 };
             });
             
@@ -88,69 +109,57 @@ export default class SponsorableAttributeManager extends LightningElement {
         }
     }
     
-    handleEditClick(event) {
-        const attributeId = event.currentTarget.dataset.id;
-        this._editModeMap = { ...this._editModeMap, [attributeId]: true };
+    handleEdit() {
+        this._isEditMode = true;
     }
     
-    handleSaveClick(event) {
-        const attributeId = event.currentTarget.dataset.id;
-        this._editModeMap = { ...this._editModeMap, [attributeId]: false };
-        this.checkForChanges();
-    }
-    
-    handleCancelClick(event) {
-        const attributeId = event.currentTarget.dataset.id;
-        
-        // Revert to original value
-        const attributeIndex = this._attributes.findIndex(attr => attr.Id === attributeId);
-        const originalAttribute = this._originalAttributes.find(attr => attr.Id === attributeId);
-        
-        if (attributeIndex !== -1 && originalAttribute) {
-            // Create a new modified array
-            const updatedAttributes = [...this._attributes];
-            updatedAttributes[attributeIndex] = {
-                ...updatedAttributes[attributeIndex],
-                editValue: this.getDisplayValue(originalAttribute)
-            };
-            this._attributes = updatedAttributes;
-        }
-        
-        // Remove from edit mode
-        this._editModeMap = { ...this._editModeMap, [attributeId]: false };
-        this.checkForChanges();
+    handleCancel() {
+        // Revert all changes back to original values
+        this._attributes = this._originalAttributes.map(original => ({
+            ...original,
+            editValue: this.getDisplayValue(original)
+        }));
+        this._isEditMode = false;
+        this._hasChanges = false;
     }
     
     handleCheckboxChange(event) {
-        const attributeId = event.target.dataset.id;
+        const uniqueId = event.target.dataset.uniqueid;
         const checked = event.target.checked;
         
-        this.updateAttributeValue(attributeId, checked);
+        this.updateAttributeValue(uniqueId, checked);
     }
     
     handleTextChange(event) {
-        const attributeId = event.target.dataset.id;
+        const uniqueId = event.target.dataset.uniqueid;
         const value = event.target.value;
         
-        this.updateAttributeValue(attributeId, value);
+        this.updateAttributeValue(uniqueId, value);
     }
     
     handleNumberChange(event) {
-        const attributeId = event.target.dataset.id;
+        const uniqueId = event.target.dataset.uniqueid;
         const value = parseFloat(event.target.value);
         
-        this.updateAttributeValue(attributeId, value);
+        this.updateAttributeValue(uniqueId, value);
     }
     
     handleDateChange(event) {
-        const attributeId = event.target.dataset.id;
+        const uniqueId = event.target.dataset.uniqueid;
         const value = event.target.value;
         
-        this.updateAttributeValue(attributeId, value);
+        this.updateAttributeValue(uniqueId, value);
     }
     
-    updateAttributeValue(attributeId, value) {
-        const attributeIndex = this._attributes.findIndex(attr => attr.Id === attributeId);
+    handlePicklistChange(event) {
+        const uniqueId = event.target.dataset.uniqueid;
+        const value = event.target.value;
+        
+        this.updateAttributeValue(uniqueId, value);
+    }
+    
+    updateAttributeValue(uniqueId, value) {
+        const attributeIndex = this._attributes.findIndex(attr => attr.uniqueId === uniqueId);
         
         if (attributeIndex !== -1) {
             // Create a new modified array
@@ -171,13 +180,15 @@ export default class SponsorableAttributeManager extends LightningElement {
         });
     }
     
-    async handleSaveAll() {
+    async handleSave() {
         try {
             this._isLoading = true;
             
             const updatedAttributes = this._attributes.map(attr => {
                 const updateData = {
                     Id: attr.Id,
+                    Sponsorable__c: this.recordId,
+                    Attribute_Type__c: attr.Attribute_Type__r?.Id,
                     Text_Value__c: null,
                     Number_Value__c: null,
                     Date_Value__c: null,
@@ -212,7 +223,7 @@ export default class SponsorableAttributeManager extends LightningElement {
             // Update original values to match current
             this._originalAttributes = JSON.parse(JSON.stringify(this._attributes));
             this._hasChanges = false;
-            this._editModeMap = {}; // Clear edit mode
+            this._isEditMode = false;
             
             this.showToast('Success', 'Attributes updated successfully', 'success');
             this._isLoading = false;
@@ -232,6 +243,18 @@ export default class SponsorableAttributeManager extends LightningElement {
         this.showToast('Error', message, 'error');
     }
     
+    getPicklistOptions(attribute) {
+        const choices = attribute.Attribute_Type__r?.Picklist_Choices__c;
+        if (!choices) {
+            return [];
+        }
+        
+        return choices.split(';').map(choice => ({
+            label: choice.trim(),
+            value: choice.trim()
+        }));
+    }
+
     showToast(title, message, variant) {
         this.dispatchEvent(
             new ShowToastEvent({
